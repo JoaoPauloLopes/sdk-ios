@@ -123,13 +123,13 @@ public class NewCardViewController : UIViewController, UITableViewDataSource, UI
 		var i = 0
 		for arr in self.inputsCells {
 			if let input = object as? UITextField {
-				if let arrTextField = arr[0] as? UITextField {
+				if let arrTextField = (arr as! NSArray)[0] as? UITextField {
 					if input == arrTextField {
 						return i
 					}
 				}
 			}
-			i++
+			i = i + 1
 		}
 		return -1
 	}
@@ -139,18 +139,23 @@ public class NewCardViewController : UIViewController, UITableViewDataSource, UI
 	}
 	
 	public func focusAndScrollForIndex(index: Int) {
-		let textField = self.inputsCells[index][0] as? UITextField!
-		let cell = self.inputsCells[index][1] as? ErrorTableViewCell!
-		if textField != nil {
-			if !textField!.isFirstResponder() {
-				textField!.becomeFirstResponder()
+		var i = 0
+		for arr in self.inputsCells {
+			if i == index {
+				if let textField = (arr as! NSArray)[0] as? UITextField {
+					if let cell = (arr as! NSArray)[1] as? ErrorTableViewCell {
+						if !textField.isFirstResponder() {
+							textField.becomeFirstResponder()
+						}
+						let indexPath = self.tableView.indexPathForCell(cell)
+						if indexPath != nil {
+							scrollToRow(indexPath!)
+						}
+					}
+					
+				}
 			}
-		}
-		if cell != nil {
-			let indexPath = self.tableView.indexPathForCell(cell!)
-			if indexPath != nil {
-				scrollToRow(indexPath!)
-			}
+			i = i + 1
 		}
 	}
 	
@@ -176,13 +181,17 @@ public class NewCardViewController : UIViewController, UITableViewDataSource, UI
 		if object != nil {
 			let index = getIndexForObject(object!)
 			if index < self.inputsCells.count {
-				let textField = self.inputsCells[index][0] as? UITextField!
-				_ = self.inputsCells[index][1] as? ErrorTableViewCell!
-				if textField != nil {
-					textField!.resignFirstResponder()
+				var i = 0
+				for arr in self.inputsCells {
+					if i == index {
+						if let textField = (arr as! NSArray)[0] as? UITextField {
+							textField.resignFirstResponder()
+							let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+							scrollToRow(indexPath)
+						}
+					}
+					i = i + 1
 				}
-				let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-				scrollToRow(indexPath)
 			}
 		}
 	}
